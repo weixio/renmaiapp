@@ -1,0 +1,7 @@
+npm start
+
+npm i pm2 -g
+
+pm2 start bin/www
+
+npm install -g node-dev
