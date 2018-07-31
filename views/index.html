@@ -1,13 +1,269 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'>
     <title>人脉app</title>
+    <link href="stylesheets/lib/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" >
+    <link href="stylesheets/reset.css" rel="stylesheet" >
+    <link href="javascripts/lib/element-ui/lib/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+        /*.element::-webkit-scrollbar {display:none}*/
+        .deatail{
+            display: inline-block;
+            line-height: 60px;
+            box-sizing: border-box;
+        }
+        .selected{
+            background-color: #00B7FF!important
+        }
+        .list{
+            box-shadow: 0 0 2px 0 #797979;
+            background-color: #e9eaf0;
+            height: 60px;
+            margin: 6px 10px;
+            font-size: 20px;
+        }
+    </style>
+
 </head>
 <body>
+<div v-cloak id="app">
 
-<h1><%= title %></h1>
-<p>hello word</p>
+    <header style="position: fixed;top:0px;background-color: #00B7FF;width: 100%">
+        <div style="margin:20px 16px 5px;">
+            <el-input style="height: 30px;" placeholder="请输入搜索内容" v-model="searchword" class="input-with-select">
+                <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+            </el-input>
+        </div>
+    </header>
+    <section style="position: fixed;display:flex;width:100%;top:70px;bottom: 50px;overflow: auto;padding-right: 10px;">
+        <div v-show="tab == 0" style="flex-grow: 1;" >
+            <div v-for="item in datalist"  @click="showdetail(item)" style="flex-direction: row;background-color: #e9eaf0;height: 60px;margin: 5px 10px;font-size: 20px; ">
+                <div style="width:30%;" class="deatail"><div style="float: right;">{{item.name}}</div></div>
+                <div style="width:40%;" class="deatail"><div style="float: right;">{{item.phone}}</div></div>
+                <div style="width:20%;" class="deatail">
+                    <div style="float: right;" @click="edit(item)"><i class="fa fa-edit"></i></div>
+                </div>
+            </div>
+        </div>
+        <el-form v-show="tab == 1" ref="form" :model="form" label-width="80px">
+            <el-form-item label="姓名">
+                <el-input v-model="form.name"></el-input>
+            </el-form-item>
+            <el-form-item label="分类">
+                <el-select v-model="form.classification" placeholder="请选择活动区域">
+                    <el-option label="同事" value="tongshi"></el-option>
+                    <el-option label="好友" value="haoyou"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="号码">
+                <el-input v-model="form.phone"></el-input>
+            </el-form-item>
+            <el-form-item label="事业领域">
+                <el-select v-model="form.region" placeholder="请选择活动区域">
+                    <el-option label="服装" value="fuzhuang"></el-option>
+                    <el-option label="IT" value="it"></el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="关系描述">
+                <el-input v-model="form.reladescribe"></el-input>
+            </el-form-item>
+
+            <el-form-item label="喜好">
+                <el-input v-model="form.interest"></el-input>
+            </el-form-item>
+
+            <el-form-item label="生日">
+                <el-col>
+                    <el-date-picker type="date" placeholder="选择日期" v-model="form.birthday" style="width: 100%;"></el-date-picker>
+                </el-col>
+            </el-form-item>
+
+            <el-form-item label="关联人">
+                <el-input v-model="form.relaperson" @click="open_guanlianren_dialog"></el-input>
+            </el-form-item>
+
+
+            <el-form-item label="性别">
+                <el-radio-group v-model="form.sex">
+                    <el-radio label="男"></el-radio>
+                    <el-radio label="女"></el-radio>
+                </el-radio-group>
+            </el-form-item>
+
+            <el-form-item label="备注">
+                <el-input type="textarea" v-model="form.commond"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">保存</el-button>
+                <el-button @click="cancel">取消</el-button>
+            </el-form-item>
+        </el-form>
+
+        <div v-show="tab == 2">
+
+        </div>
+
+
+        <!--<i class="fa fa-camera-retro fa-4x"></i> fa-4x-->
+        <!--<p>hello word</p>-->
+        <!--<router-view></router-view>-->
+    </section>
+    <footer style="position: fixed;bottom:0px;height: 50px; background-color: #00B7FF;width: 100%">
+        <div style="display: flex;margin: 5px;">
+            <el-button type="primary" icon="el-icon-more" style=" flex-grow:1" @click="more"></el-button>
+            <el-button type="success" icon="el-icon-plus" style=" flex-grow:1" @click="add" ></el-button>
+        </div>
+    </footer>
+
+
+    <div v-show="true">
+        <div style="position: fixed;top: 0;left: 0;right: 0;bottom: 0;
+            background-color: #969696;z-index: 9;opacity: 0.7;">
+        </div>
+        <div style="position: fixed;width: 80%;height: 80%;margin: 10% 10%;background-color: white;z-index: 10;">
+            <div style="margin:20px 16px 5px;">
+                <el-input style="height: 30px;" placeholder="请输入搜索内容" v-model="searchword" class="input-with-select">
+                    <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                </el-input>
+            </div>
+            <div style="overflow: auto;position:absolute;bottom:60px;top:60px;width:100%;">
+                <div v-for="item in datalist"   @click="select(item)" class="list"  v-bind:class="{'selected':item.isSelect }"  >
+                    <div style="width:30%;" class="deatail"><div style="float: right;">{{item.name}}</div></div>
+                    <div style="width:60%;" class="deatail"><div style="float: right;">{{item.phone}}</div></div>
+                </div>
+            </div>
+            <div style="height:60px;display:flex;position:absolute;width:100%;bottom:0px;padding: 10px;box-sizing: border-box">
+                <el-button style="flex-grow: 1" type="primary">确定</el-button>
+                <el-button style="flex-grow: 1" >取消</el-button>
+            </div>
+        </div>
+    </div>
+
+
+    </div>
+</div>
+
+<script src="javascripts/lib/jquery/1.9.1/jquery.min.js"></script>
+<script src="javascripts/lib/vue/dist/vue.js"></script>
+<script src="javascripts/lib/vue-router/dist/vue-router.min.js"></script>
+<script src="javascripts/lib/element-ui/lib/index.js"></script>
+<script src="javascripts/lib/axios/dist/axios.js"></script>
+<script>
+    var myComponent = {template:'<div>i am component</div>'};
+    var com1 = {template:'<div>i am com1</div>'};
+
+    Vue.component('my-component', myComponent)
+    Vue.component('com1', com1)
+    Vue.use(VueRouter)
+    var router = new VueRouter({
+        routes: [
+            {
+                path: '/my',
+                name:'myComponent',
+                component: myComponent
+            },
+            {
+                path: '/com1',
+                name:'com1',
+                component: com1
+            },
+        ]
+    });
+    var app = new Vue({
+        el: '#app',
+        router : router,
+        data: {
+            tab : 0,
+            datalist : [],
+            tt:'sfff',
+            searchword:'',
+            form: {
+                name: '',
+                classification : '',
+                phone : '',
+                region : '',
+                reladescribe :'',
+                interest : '',
+                birthday : '',
+                relaperson : '',
+                sex : '',
+                commond : '',
+                flag : false
+            }
+        },
+        mounted(){
+            this.more()
+        },
+        methods:{
+            add(){
+                for(var o in this.form){
+                    this.form[o] = '';
+                }
+                this.tab = 1;
+            },
+            more(){
+                this.tab = 0;
+                var that = this;
+                axios.get('/people/get', {}).then(res => {
+                    console.log(res)
+                    that.datalist = res.data;
+                }).catch(err => {
+                    console.error(err)
+                })
+            },
+            onSubmit() {
+                var that = this;
+                var formData = new FormData()
+//                formData.append('fd', this.form);
+                axios.post('/people/save', this.form).then(res => {
+                    this.more();
+                }).catch(err => {
+                    console.error(err)
+                })
+            },
+            cancel(){
+                this.tab = 0;
+            },
+            showdetail(item){
+//                this.tab = 1;
+//                this.form = item;
+            },
+            edit(item){
+                this.tab = 1;
+                this.form = item;
+            },
+            open_guanlianren_dialog(){
+
+            },
+            select(item){
+                console.log('select')
+                let f = item.isSelect;
+                this.$set(item,'isSelect',!f)
+            },
+            search(){
+                this.tab = 0;
+                let searchword = this.searchword;
+                let filter = this.datalist.filter(item=>{
+                    let flag = false;
+                    for (var o in item){
+                        if (typeof(item[o]) == "string" ){
+                            if (item[o].indexOf(searchword) > -1){
+                                flag = true;
+                            }
+                        }
+                    }
+                    return flag;
+                });
+                this.datalist = filter;
+            }
+        }
+    })
+</script>
 </body>
 </html>
