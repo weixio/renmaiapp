@@ -85,9 +85,12 @@
             </el-form-item>
 
             <el-form-item label="关联人">
-                <el-input v-model="form.relaperson" @click="open_guanlianren_dialog"></el-input>
+                <!--<el-input v-model="form.relaperson" @focus="open_guanlianren_dialog"></el-input>-->
+                <el-input  v-model="relaperson_name" @focus="open_guanlianren_dialog"></el-input>
+
             </el-form-item>
 
+            <el-input v-show="false" v-model="form.relaperson"></el-input>
 
             <el-form-item label="性别">
                 <el-radio-group v-model="form.sex">
@@ -105,7 +108,7 @@
             </el-form-item>
         </el-form>
 
-        <div v-show="tab == 2">
+        <div id="person_rela_chart" v-show="tab == 2">
 
         </div>
 
@@ -122,31 +125,31 @@
     </footer>
 
 
-    <div v-show="true">
+    <div v-show="rela_layer_ifshow">
         <div style="position: fixed;top: 0;left: 0;right: 0;bottom: 0;
             background-color: #969696;z-index: 9;opacity: 0.7;">
         </div>
         <div style="position: fixed;width: 80%;height: 80%;margin: 10% 10%;background-color: white;z-index: 10;">
             <div style="margin:20px 16px 5px;">
-                <el-input style="height: 30px;" placeholder="请输入搜索内容" v-model="searchword" class="input-with-select">
-                    <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                <el-input style="height: 30px;" placeholder="请输入搜索内容" v-model="searchword2" class="input-with-select">
+                    <el-button slot="append" icon="el-icon-search" @click="search2"></el-button>
                 </el-input>
             </div>
             <div style="overflow: auto;position:absolute;bottom:60px;top:60px;width:100%;">
-                <div v-for="item in datalist"   @click="select(item)" class="list"  v-bind:class="{'selected':item.isSelect }"  >
+                <div v-for="item in datalist2"   @click="select(item)" class="list"  v-bind:class="{'selected':item.isSelect }"  >
                     <div style="width:30%;" class="deatail"><div style="float: right;">{{item.name}}</div></div>
                     <div style="width:60%;" class="deatail"><div style="float: right;">{{item.phone}}</div></div>
                 </div>
             </div>
             <div style="height:60px;display:flex;position:absolute;width:100%;bottom:0px;padding: 10px;box-sizing: border-box">
-                <el-button style="flex-grow: 1" type="primary">确定</el-button>
-                <el-button style="flex-grow: 1" >取消</el-button>
+                <el-button style="flex-grow: 1" @click="reset_query" >重置</el-button>
+                <el-button style="flex-grow: 1" type="primary" @click="rela_queding">确定</el-button>
+                <el-button style="flex-grow: 1" @click="rela_cancle" >取消</el-button>
             </div>
         </div>
     </div>
-
-
     </div>
+
 </div>
 
 <script src="javascripts/lib/jquery/1.9.1/jquery.min.js"></script>
@@ -179,10 +182,14 @@
         el: '#app',
         router : router,
         data: {
+            peole_rela_charts_showflag : true,
             tab : 0,
+            rela_layer_ifshow : false,
             datalist : [],
+            datalist2 : [],
             tt:'sfff',
             searchword:'',
+            searchword2 : '',
             form: {
                 name: '',
                 classification : '',
@@ -195,7 +202,8 @@
                 sex : '',
                 commond : '',
                 flag : false
-            }
+            },
+            relaperson_name : ''
         },
         mounted(){
             this.more()
@@ -205,6 +213,7 @@
                 for(var o in this.form){
                     this.form[o] = '';
                 }
+                this.relaperson_name = '';
                 this.tab = 1;
             },
             more(){
@@ -239,7 +248,8 @@
                 this.form = item;
             },
             open_guanlianren_dialog(){
-
+                this.rela_layer_ifshow = true;
+                this.reset_query();
             },
             select(item){
                 console.log('select')
@@ -261,9 +271,54 @@
                     return flag;
                 });
                 this.datalist = filter;
+            },
+            search2(){
+//                this.tab = 0;
+                let searchword = this.searchword2;
+                let filter = this.datalist.filter(item=>{
+                    let flag = false;
+                    for (var o in item){
+                        if (typeof(item[o]) == "string" ){
+                            if (item[o].indexOf(searchword) > -1){
+                                flag = true;
+                            }
+                        }
+                    }
+                    return flag;
+                });
+                this.datalist2 = filter;
+            },
+            reset_query(){
+//                this.tab = 0;
+                this.searchword2 = '';
+                var that = this;
+                axios.get('/people/get', {}).then(res => {
+                    console.log(res)
+                    that.datalist2 = res.data;
+                }).catch(err => {
+                    console.error(err)
+                })
+            },
+            rela_queding(){
+                let idarr = [];
+                let namearr = [];
+                let join = this.datalist2.filter(item=>item.isSelect == true);
+                join.forEach(item=>{
+                    idarr.push(item.id)
+                    namearr.push(item.name)
+                })
+//                console.log(idarr.join(','))
+                this.form.relaperson = idarr.join(',');
+                this.relaperson_name = namearr.join(',');
+                this.rela_layer_ifshow = false;
+            },
+            rela_cancle(){
+                this.rela_layer_ifshow = false;
             }
         }
     })
+
+
 </script>
 </body>
 </html>
