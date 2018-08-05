@@ -417,7 +417,9 @@ define('echarts/chart/tree', [
     zrUtil.inherits(Tree, ChartBase);
     require('../chart').define('tree', Tree);
     return Tree;
-});define('echarts/layout/Tree', [
+});
+
+define('echarts/layout/Tree', [
     'require',
     'zrender/tool/vector'
 ], function (require) {
@@ -491,7 +493,9 @@ define('echarts/chart/tree', [
         }
     };
     return TreeLayout;
-});define('echarts/data/Tree', [
+});
+
+define('echarts/data/Tree', [
     'require',
     'zrender/tool/util'
 ], function (require) {

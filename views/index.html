@@ -46,7 +46,7 @@
                 <div style="width:30%;" class="deatail"><div style="float: right;">{{item.name}}</div></div>
                 <div style="width:40%;" class="deatail"><div style="float: right;">{{item.phone}}</div></div>
                 <div style="width:20%;" class="deatail">
-                    <div style="float: right;" @click="edit(item)"><i class="fa fa-edit"></i></div>
+                    <div style="float: right;" @click.prevent.stop="edit(item)"><i class="fa fa-edit"></i></div>
                 </div>
             </div>
         </div>
@@ -86,7 +86,7 @@
 
             <el-form-item label="关联人">
                 <!--<el-input v-model="form.relaperson" @focus="open_guanlianren_dialog"></el-input>-->
-                <el-input  v-model="relaperson_name" @focus="open_guanlianren_dialog"></el-input>
+                <el-input  v-model="form.relaperson_name" @focus="open_guanlianren_dialog"></el-input>
 
             </el-form-item>
 
@@ -108,8 +108,12 @@
             </el-form-item>
         </el-form>
 
-        <div id="person_rela_chart" v-show="tab == 2">
-
+        <div v-show="tab == 2">
+            <div id="person_rela_chart" style="height:500px;" >
+            </div>
+            <div style="padding-left: 20px;">
+                篮球：小一，小二
+            </div>
         </div>
 
 
@@ -157,6 +161,8 @@
 <script src="javascripts/lib/vue-router/dist/vue-router.min.js"></script>
 <script src="javascripts/lib/element-ui/lib/index.js"></script>
 <script src="javascripts/lib/axios/dist/axios.js"></script>
+<script src="javascripts/lib/echarts.min_tree.js"></script>
+<!--<script src="javascripts/lib/echarts-2.2.7/build/dist/echarts.js"></script>-->
 <script>
     var myComponent = {template:'<div>i am component</div>'};
     var com1 = {template:'<div>i am com1</div>'};
@@ -180,43 +186,45 @@
     });
     var app = new Vue({
         el: '#app',
-        router : router,
+        router: router,
         data: {
-            peole_rela_charts_showflag : true,
-            tab : 0,
-            rela_layer_ifshow : false,
-            datalist : [],
-            datalist2 : [],
-            tt:'sfff',
-            searchword:'',
-            searchword2 : '',
+            myChart : {},
+            option : {},
+            peole_rela_charts_showflag: true,
+            tab: 0,
+            rela_layer_ifshow: false,
+            datalist: [],
+            datalist2: [],
+            tt: 'sfff',
+            searchword: '',
+            searchword2: '',
             form: {
                 name: '',
-                classification : '',
-                phone : '',
-                region : '',
-                reladescribe :'',
-                interest : '',
-                birthday : '',
-                relaperson : '',
-                sex : '',
-                commond : '',
-                flag : false
+                classification: '',
+                phone: '',
+                region: '',
+                reladescribe: '',
+                interest: '',
+                birthday: '',
+                relaperson: '',
+                relaperson_name: '',
+                sex: '',
+                commond: '',
+                flag: false
             },
-            relaperson_name : ''
         },
-        mounted(){
-            this.more()
+        mounted() {
+            this.more();
+            this.init_echarts();
         },
-        methods:{
-            add(){
-                for(var o in this.form){
+        methods: {
+            add() {
+                for (var o in this.form) {
                     this.form[o] = '';
                 }
-                this.relaperson_name = '';
                 this.tab = 1;
             },
-            more(){
+            more() {
                 this.tab = 0;
                 var that = this;
                 axios.get('/people/get', {}).then(res => {
@@ -236,34 +244,44 @@
                     console.error(err)
                 })
             },
-            cancel(){
+            cancel() {
                 this.tab = 0;
             },
-            showdetail(item){
-//                this.tab = 1;
-//                this.form = item;
+            showdetail(item) {
+                this.tab = 2;
+                axios.post('/people/getRela', item).then(res => {
+//                    this.more();
+                    console.log(res.data);
+                    let option = this.option;
+                    option.series[0].data[0]={};
+                    this.myChart.setOption(option);
+                    option.series[0].data[0]=res.data;
+                    this.myChart.setOption(option);
+                }).catch(err => {
+                    console.error(err)
+                })
             },
-            edit(item){
+            edit(item) {
                 this.tab = 1;
                 this.form = item;
             },
-            open_guanlianren_dialog(){
+            open_guanlianren_dialog() {
                 this.rela_layer_ifshow = true;
                 this.reset_query();
             },
-            select(item){
+            select(item) {
                 console.log('select')
                 let f = item.isSelect;
-                this.$set(item,'isSelect',!f)
+                this.$set(item, 'isSelect', !f)
             },
-            search(){
+            search() {
                 this.tab = 0;
                 let searchword = this.searchword;
-                let filter = this.datalist.filter(item=>{
+                let filter = this.datalist.filter(item => {
                     let flag = false;
-                    for (var o in item){
-                        if (typeof(item[o]) == "string" ){
-                            if (item[o].indexOf(searchword) > -1){
+                    for (var o in item) {
+                        if (typeof(item[o]) == "string") {
+                            if (item[o].indexOf(searchword) > -1) {
                                 flag = true;
                             }
                         }
@@ -272,14 +290,14 @@
                 });
                 this.datalist = filter;
             },
-            search2(){
+            search2() {
 //                this.tab = 0;
                 let searchword = this.searchword2;
-                let filter = this.datalist.filter(item=>{
+                let filter = this.datalist.filter(item => {
                     let flag = false;
-                    for (var o in item){
-                        if (typeof(item[o]) == "string" ){
-                            if (item[o].indexOf(searchword) > -1){
+                    for (var o in item) {
+                        if (typeof(item[o]) == "string") {
+                            if (item[o].indexOf(searchword) > -1) {
                                 flag = true;
                             }
                         }
@@ -288,7 +306,7 @@
                 });
                 this.datalist2 = filter;
             },
-            reset_query(){
+            reset_query() {
 //                this.tab = 0;
                 this.searchword2 = '';
                 var that = this;
@@ -299,21 +317,84 @@
                     console.error(err)
                 })
             },
-            rela_queding(){
+            rela_queding() {
                 let idarr = [];
                 let namearr = [];
-                let join = this.datalist2.filter(item=>item.isSelect == true);
-                join.forEach(item=>{
+                let join = this.datalist2.filter(item => item.isSelect == true);
+                join.forEach(item => {
                     idarr.push(item.id)
                     namearr.push(item.name)
-                })
+                });
 //                console.log(idarr.join(','))
                 this.form.relaperson = idarr.join(',');
-                this.relaperson_name = namearr.join(',');
+                this.form.relaperson_name = namearr.join(',');
                 this.rela_layer_ifshow = false;
             },
-            rela_cancle(){
+            rela_cancle() {
                 this.rela_layer_ifshow = false;
+            },
+            init_echarts() {
+                let clientWidth = document.body.clientWidth;
+                let persondiv = document.querySelector('#person_rela_chart');
+                persondiv.style.width = clientWidth+'px';
+                var myChart = echarts.init(document.getElementById('person_rela_chart'));
+                var option = {
+                    series: [
+                        {
+                            name: '树图',
+                            type: 'tree',
+                            orient: 'vertical',  // vertical horizontal
+                            rootLocation: {left: '50%'}, // 根节点位置  {x: 100, y: 'center'}
+                            nodePadding: 8,
+                            layerPadding: 200,
+                            hoverable: false,
+                            roam: true,
+                            symbolSize: 16,
+                            itemStyle: {
+                                normal: {
+                                    color: '#4883b4',
+                                    label: {
+                                        show: true,
+                                        position: 'right',
+                                        formatter: "{b}",
+                                        textStyle: {
+                                            color: '#000',
+                                            fontSize: 16
+                                        }
+                                    },
+                                    lineStyle: {
+                                        color: '#ccc',
+                                        type: 'solid' // 'curve'|'broken'|'solid'|'dotted'|'dashed'
+                                    }
+                                },
+                                emphasis: {
+                                    color: '#4883b4',
+                                    label: {
+                                        show: false
+                                    },
+                                    borderWidth: 0
+                                }
+                            },
+                            data: [
+                                {"name": "张三", "id": "123", "children":
+                                    [
+                                        {"id": "12","name": "李四","children":[
+                                            {"id": "12","name": "王武"},
+                                            {"id": "12","name": "王武"}
+                                        ]},
+                                        {"id": "12","name": "王武"}
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                };
+                myChart.setOption(option);
+                this.myChart = myChart;
+                this.option = option;
+                myChart.on('click', function (params) {
+                    console.log(params.data.id);
+                });
             }
         }
     })
