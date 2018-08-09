@@ -1,0 +1,52 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta charset="UTF-8">
+<head>
+    <title>复利计算器</title>
+    <style>
+    </style>
+</head>
+<body>
+
+<div style="display: flex;justify-content: center">
+    <table>
+        <th colspan="2">复利计算器</th>
+        <tr>
+            <td>每年增存：</td>
+            <td><input id="save_peryear" type="text" placeholder="每年存款" value="100000"></td>
+        </tr>
+        <tr>
+            <td>每年收益率：</td>
+            <td><input id="rate" type="text" placeholder="每年收益率" value="0.04"></td>
+        </tr>
+        <tr>
+            <td>年数：</td>
+            <td><input id="years" type="text" placeholder="年数" value="5"></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align: center">
+                <button id="cacl" onclick="cacl()">计算</button>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center"><span id="result"></span></td>
+        </tr>
+    </table>
+</div>
+
+</body>
+<script src="require.js" type="text/javascript"></script>
+<script type="text/javascript">
+    function cacl() {
+        let save_peryear = document.querySelector("#save_peryear").value * 1;
+        let rate = document.querySelector("#rate").value * 1;
+        let years = document.querySelector("#years").value * 1;
+        let result = document.querySelector("#result");
+        let sum = 0;
+        for (let i = 1; i <= years; i++) {
+            sum = sum * 1 + save_peryear;
+            sum = sum * (1 + rate);
+        }
+        result.innerHTML = sum;
+    }
+</script>
+</html>

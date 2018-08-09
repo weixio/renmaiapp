@@ -249,14 +249,13 @@
             },
             showdetail(item) {
                 this.tab = 2;
+                this.option.series[0].data[0]={};
+                this.myChart.setOption(this.option);
                 axios.post('/people/getRela', item).then(res => {
 //                    this.more();
                     console.log(res.data);
-                    let option = this.option;
-                    option.series[0].data[0]={};
-                    this.myChart.setOption(option);
-                    option.series[0].data[0]=res.data;
-                    this.myChart.setOption(option);
+                    this.option.series[0].data[0]=res.data;
+                    this.myChart.setOption(this.option);
                 }).catch(err => {
                     console.error(err)
                 })
@@ -343,6 +342,7 @@
                         {
                             name: '树图',
                             type: 'tree',
+                            initialTreeDepth : -1,
                             orient: 'vertical',  // vertical horizontal
                             rootLocation: {left: '50%'}, // 根节点位置  {x: 100, y: 'center'}
                             nodePadding: 8,
