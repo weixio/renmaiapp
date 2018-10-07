@@ -4,28 +4,52 @@
     <meta charset="UTF-8">
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'>
     <title>人脉app</title>
-    <link href="stylesheets/lib/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" >
-    <link href="stylesheets/reset.css" rel="stylesheet" >
+    <link href="stylesheets/lib/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="stylesheets/reset.css" rel="stylesheet">
     <link href="javascripts/lib/element-ui/lib/theme-chalk/index.css" rel="stylesheet">
     <style>
         [v-cloak] {
             display: none;
         }
+
         /*.element::-webkit-scrollbar {display:none}*/
-        .deatail{
+        .deatail {
             display: inline-block;
             line-height: 60px;
             box-sizing: border-box;
         }
-        .selected{
-            background-color: #00B7FF!important
+
+        .selected {
+            background-color: #00B7FF !important
         }
-        .list{
+
+        .list {
             box-shadow: 0 0 2px 0 #797979;
             background-color: #e9eaf0;
             height: 60px;
             margin: 6px 10px;
             font-size: 20px;
+        }
+
+        .el-select {
+            width: 100px;
+        }
+
+        .expand{
+            transform:rotate(90deg)  !important;;
+            -ms-transform:rotate(90deg)  !important;; 	/* IE 9 */
+            -moz-transform:rotate(90deg)  !important;; 	/* Firefox */
+            -webkit-transform:rotate(90deg)  !important;; /* Safari 和 Chrome */
+            -o-transform:rotate(90deg)  !important;; 	/* Opera */
+            /*transition: all .3s;*/
+        }
+        .collapse{
+            transform:rotate(0deg);
+            -ms-transform:rotate(0deg) ; 	/* IE 9 */
+            -moz-transform:rotate(0deg) ; 	/* Firefox */
+            -webkit-transform:rotate(0deg); /* Safari 和 Chrome */
+            -o-transform:rotate(0deg); 	/* Opera */
+            transition: all .3s;
         }
     </style>
 
@@ -33,125 +57,227 @@
 <body>
 <div v-cloak id="app">
 
-    <header style="position: fixed;top:0px;background-color: #00B7FF;width: 100%">
-        <div style="margin:20px 16px 5px;">
-            <el-input style="height: 30px;" placeholder="请输入搜索内容" v-model="searchword" class="input-with-select">
-                <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-            </el-input>
-        </div>
-    </header>
-    <section style="position: fixed;display:flex;width:100%;top:70px;bottom: 50px;overflow: auto;padding-right: 10px;">
-        <div v-show="tab == 0" style="flex-grow: 1;" >
-            <div v-for="item in datalist"  @click="showdetail(item)" style="flex-direction: row;background-color: #e9eaf0;height: 60px;margin: 5px 10px;font-size: 20px; ">
-                <div style="width:30%;" class="deatail"><div style="float: right;">{{item.name}}</div></div>
-                <div style="width:40%;" class="deatail"><div style="float: right;">{{item.phone}}</div></div>
-                <div style="width:20%;" class="deatail">
-                    <div style="float: right;" @click.prevent.stop="edit(item)"><i class="fa fa-edit"></i></div>
-                </div>
-            </div>
-        </div>
-        <el-form v-show="tab == 1" ref="form" :model="form" label-width="80px">
-            <el-form-item label="姓名">
-                <el-input v-model="form.name"></el-input>
-            </el-form-item>
-            <el-form-item label="分类">
-                <el-select v-model="form.classification" placeholder="请选择活动区域">
-                    <el-option label="同事" value="tongshi"></el-option>
-                    <el-option label="好友" value="haoyou"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="号码">
-                <el-input v-model="form.phone"></el-input>
-            </el-form-item>
-            <el-form-item label="事业领域">
-                <el-select v-model="form.region" placeholder="请选择活动区域">
-                    <el-option label="服装" value="fuzhuang"></el-option>
-                    <el-option label="IT" value="it"></el-option>
-                </el-select>
-            </el-form-item>
-
-            <el-form-item label="关系描述">
-                <el-input v-model="form.reladescribe"></el-input>
-            </el-form-item>
-
-            <el-form-item label="喜好">
-                <el-input v-model="form.interest"></el-input>
-            </el-form-item>
-
-            <el-form-item label="生日">
-                <el-col>
-                    <el-date-picker type="date" placeholder="选择日期" v-model="form.birthday" style="width: 100%;"></el-date-picker>
-                </el-col>
-            </el-form-item>
-
-            <el-form-item label="关联人">
-                <!--<el-input v-model="form.relaperson" @focus="open_guanlianren_dialog"></el-input>-->
-                <el-input  v-model="form.relaperson_name" @focus="open_guanlianren_dialog"></el-input>
-
-            </el-form-item>
-
-            <el-input v-show="false" v-model="form.relaperson"></el-input>
-
-            <el-form-item label="性别">
-                <el-radio-group v-model="form.sex">
-                    <el-radio label="男"></el-radio>
-                    <el-radio label="女"></el-radio>
-                </el-radio-group>
-            </el-form-item>
-
-            <el-form-item label="备注">
-                <el-input type="textarea" v-model="form.commond"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="onSubmit">保存</el-button>
-                <el-button @click="cancel">取消</el-button>
-            </el-form-item>
-        </el-form>
-
-        <div v-show="tab == 2">
-            <div id="person_rela_chart" style="height:500px;" >
-            </div>
-            <div style="padding-left: 20px;">
-                篮球：小一，小二
-            </div>
-        </div>
-
-
-        <!--<i class="fa fa-camera-retro fa-4x"></i> fa-4x-->
-        <!--<p>hello word</p>-->
-        <!--<router-view></router-view>-->
-    </section>
-    <footer style="position: fixed;bottom:0px;height: 50px; background-color: #00B7FF;width: 100%">
-        <div style="display: flex;margin: 5px;">
-            <el-button type="primary" icon="el-icon-more" style=" flex-grow:1" @click="more"></el-button>
-            <el-button type="success" icon="el-icon-plus" style=" flex-grow:1" @click="add" ></el-button>
-        </div>
-    </footer>
-
-
-    <div v-show="rela_layer_ifshow">
-        <div style="position: fixed;top: 0;left: 0;right: 0;bottom: 0;
-            background-color: #969696;z-index: 9;opacity: 0.7;">
-        </div>
-        <div style="position: fixed;width: 80%;height: 80%;margin: 10% 10%;background-color: white;z-index: 10;">
+    <div v-show="login.if_login">
+        <header style="position: fixed;top:0px;background-color: #00B7FF;width: 100%">
             <div style="margin:20px 16px 5px;">
-                <el-input style="height: 30px;" placeholder="请输入搜索内容" v-model="searchword2" class="input-with-select">
-                    <el-button slot="append" icon="el-icon-search" @click="search2"></el-button>
+                <el-input style="height: 30px;" placeholder="请输入搜索内容" v-model="searchword" class="input-with-select">
+                    <el-select v-model="searchType" slot="prepend">
+                        <el-option label="姓名" value="xm"></el-option>
+                        <el-option label="号码" value="hm"></el-option>
+                        <el-option label="喜好" value="xh"></el-option>
+                    </el-select>
+                    <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
             </div>
-            <div style="overflow: auto;position:absolute;bottom:60px;top:60px;width:100%;">
-                <div v-for="item in datalist2"   @click="select(item)" class="list"  v-bind:class="{'selected':item.isSelect }"  >
-                    <div style="width:30%;" class="deatail"><div style="float: right;">{{item.name}}</div></div>
-                    <div style="width:60%;" class="deatail"><div style="float: right;">{{item.phone}}</div></div>
+        </header>
+        <section
+                style="position: fixed;display:flex;width:100%;top:70px;bottom: 50px;overflow: auto;padding-right: 10px;">
+            <div v-show="tab == 0" style="flex-grow: 1;">
+                <div v-for="item in datalist" @click="showdetail(item)"
+                     style="flex-direction: row;background-color: #e9eaf0;height: 60px;margin: 5px 10px;font-size: 20px; ">
+                    <div style="width:30%;" class="deatail">
+                        <div style="float: right;">{{item.name}}</div>
+                    </div>
+                    <div style="width:40%;" class="deatail">
+                        <div style="float: right;">{{item.phone}}</div>
+                    </div>
+                    <div style="width:20%;" class="deatail">
+                        <div style="float: right;" @click.prevent.stop="edit(item)"><i class="fa fa-edit"></i></div>
+                    </div>
                 </div>
             </div>
-            <div style="height:60px;display:flex;position:absolute;width:100%;bottom:0px;padding: 10px;box-sizing: border-box">
-                <el-button style="flex-grow: 1" @click="reset_query" >重置</el-button>
-                <el-button style="flex-grow: 1" type="primary" @click="rela_queding">确定</el-button>
-                <el-button style="flex-grow: 1" @click="rela_cancle" >取消</el-button>
+            <el-form v-show="tab == 1" ref="form" :model="form" label-width="80px">
+                <el-form-item label="姓名">
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="分类">
+                    <el-select v-model="form.classification" placeholder="请选择活动区域">
+                        <el-option label="同事" value="tongshi"></el-option>
+                        <el-option label="好友" value="haoyou"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="号码">
+                    <el-input v-model="form.phone"></el-input>
+                </el-form-item>
+                <el-form-item label="事业领域">
+                    <el-select v-model="form.region" placeholder="请选择活动区域">
+                        <el-option label="服装" value="fuzhuang"></el-option>
+                        <el-option label="IT" value="it"></el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item label="关系描述">
+                    <el-input v-model="form.reladescribe"></el-input>
+                </el-form-item>
+
+                <el-form-item label="喜好">
+                    <el-input v-model="form.interest"></el-input>
+                </el-form-item>
+
+                <el-form-item label="忌讳">
+                    <el-input v-model="form.hate"></el-input>
+                </el-form-item>
+
+
+                <el-form-item label="生日">
+                    <el-col>
+                        <el-date-picker type="date" placeholder="选择日期" v-model="form.birthday" value-format="yyyy-MM-dd"
+                                        style="width: 100%;"></el-date-picker>
+                    </el-col>
+                </el-form-item>
+
+                <el-form-item label="关联人">
+                    <!--<el-input v-model="form.relaperson" @focus="open_guanlianren_dialog"></el-input>-->
+                    <el-input v-model="form.relaperson_name" @focus="open_guanlianren_dialog"></el-input>
+
+                </el-form-item>
+
+                <el-input v-show="false" v-model="form.relaperson"></el-input>
+
+                <el-form-item label="性别">
+                    <el-radio-group v-model="form.sex">
+                        <el-radio label="男"></el-radio>
+                        <el-radio label="女"></el-radio>
+                    </el-radio-group>
+                </el-form-item>
+
+                <el-form-item label="备注">
+                    <el-input type="textarea" v-model="form.commond"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit">保存</el-button>
+                    <el-button @click="cancel">取消</el-button>
+                </el-form-item>
+            </el-form>
+
+            <div v-show="tab == 2">
+                <div id="person_rela_chart" style="height:300px;">
+                </div>
+                <div v-show="showInterest"
+                     style="padding: 20px;height: 30px;line-height:30px;background-color: #00B7FF;font-size: 20px;">
+                    喜好：{{showInterest}}<br>
+                </div>
+                <div v-show="samexh"
+                     style="padding: 20px;height: 30px;line-height:30px;background-color: #00B7FF;font-size: 20px;">
+                    相同喜好：{{samexh}}
+                </div>
+            </div>
+
+            <div v-show="tab == 3" style="width: 100vw;height: 60px;">
+                <div v-for="item in settinglist" @click="settingclick(item)"
+                     style="display: flex;align-items: center ;justify-content:center;background-color: #e9eaf0;height: 60px;margin: 5px 10px;font-size: 20px; ">
+                    <div><span style="color: #00B7FF">{{item.name}}</span></div>
+                </div>
+            </div>
+
+            <div v-show="tab == 4" style="width: 100vw;height: 60px;">
+                <div @click="shentritixing"
+                     style="display: flex;background-color: #00B7FF;height: 60px;margin: 5px 10px;font-size: 20px;position: relative ">
+                    <div style="line-height: 60px;padding: 0 20px;"><span style="line-height: 60px">生日提醒</span></div>
+                    <div style="line-height: 60px;padding: 0 20px;position:absolute;right: 0;top: 0"
+                         class="collapse" :class="{expand : show_shengritixing}">
+                        <i  class="el-icon-arrow-right " ></i>
+                        <!--<i v-show="!show_shengritixing" class="el-icon-arrow-right"></i>-->
+                        <!--<i v-show="show_shengritixing" class="el-icon-arrow-down"></i>-->
+                    </div>
+                </div>
+
+                <div v-show="show_shengritixing">
+                    <div v-for="item in list_shengritixing"
+                            style="display: flex;background-color: #e9eaf0;height: 60px;margin: 5px 10px;font-size: 20px;position: relative ">
+                        <div style="line-height: 60px;padding: 0 20px;"><span style="line-height: 60px">{{item.name}}</span></div>
+                        <div style="line-height: 60px;padding: 0 20px;position:absolute;right: 0;top: 0">
+                            {{item.birthday}}
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!--<i class="fa fa-camera-retro fa-4x"></i> fa-4x-->
+            <!--<p>hello word</p>-->
+            <!--<router-view></router-view>-->
+        </section>
+        <footer style="position: fixed;bottom:0px;height: 50px; background-color: #00B7FF;width: 100%">
+            <div style="display: flex;margin: 5px;">
+                <el-button type="primary" icon="el-icon-more" style=" flex-grow:1" @click="more"></el-button>
+                <el-button type="success" icon="el-icon-plus" style=" flex-grow:1" @click="add"></el-button>
+                <el-button type="success" tyle=" flex-grow:1" style=" flex-grow:1" @click="setting">设置</el-button>
+            </div>
+        </footer>
+        <div v-show="rela_layer_ifshow">
+            <div style="position: fixed;top: 0;left: 0;right: 0;bottom: 0;
+            background-color: #969696;z-index: 9;opacity: 0.7;">
+            </div>
+            <div style="position: fixed;width: 80%;height: 80%;margin: 10% 10%;background-color: white;z-index: 10;">
+                <div style="margin:20px 16px 5px;">
+                    <el-input style="height: 30px;" placeholder="请输入搜索内容" v-model="searchword2"
+                              class="input-with-select">
+                        <el-button slot="append" icon="el-icon-search" @click="search2"></el-button>
+                    </el-input>
+                </div>
+                <div style="overflow: auto;position:absolute;bottom:60px;top:60px;width:100%;">
+                    <div v-for="item in datalist2" @click="select(item)" class="list"
+                         v-bind:class="{'selected':item.isSelect }">
+                        <div style="width:30%;" class="deatail">
+                            <div style="float: right;">{{item.name}}</div>
+                        </div>
+                        <div style="width:60%;" class="deatail">
+                            <div style="float: right;">{{item.phone}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="height:60px;display:flex;position:absolute;width:100%;bottom:0px;padding: 10px;box-sizing: border-box">
+                    <el-button style="flex-grow: 1" @click="reset_query">重置</el-button>
+                    <el-button style="flex-grow: 1" type="primary" @click="rela_queding">确定</el-button>
+                    <el-button style="flex-grow: 1" @click="rela_cancle">取消</el-button>
+                </div>
             </div>
         </div>
     </div>
+    <div v-show="!login.if_login">
+        <div v-show="login.loginOrchange" style="position: fixed;top: 0;left: 0;right: 0;bottom: 0;width:100%;height:100%;
+        display: flex;justify-content: space-around;align-items: center">
+            <div style="width: 80%;height: 50%;display: flex;flex-direction: column">
+                <div style="flex-grow:1">
+                    <el-input v-model="login.pw" type="password" placeholder="请输入密码"></el-input>
+                </div>
+                <div style="flex-grow:1">
+                    <div style="flex-grow:1;">
+                        <el-button style="width:100%;" @click="clickLogin" type="primary">登录</el-button>
+                    </div>
+                    <div style="padding-top: 4px">
+                        <el-button style="width:100%;" @click="changePw" type="primary">更改密码</el-button>
+                    </div>
+
+                    <div style="padding-top: 4px;display:flex;align-items:center;justify-content: center">
+                        <el-checkbox border size="medium " v-model="login.keep_login">保持登录</el-checkbox>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div v-show="!login.loginOrchange" style="position: fixed;top: 0;left: 0;right: 0;bottom: 0;width:100%;height:100%;
+        display: flex;justify-content: space-around;align-items: center">
+            <div style="width: 80%;height: 50%;display: flex;flex-direction: column">
+                <div style="flex-grow:1">
+                    <el-input v-model="login.originpwd" placeholder="请输入原密码"></el-input>
+                </div>
+                <div style="flex-grow:1">
+                    <el-input v-model="login.newpwd" placeholder="请输入新密码"></el-input>
+                </div>
+                <div style="flex-grow:1">
+                    <div style="padding-top: 4px">
+                        <el-button style="width:100%;" @click="changePw_queding" type="primary">确定</el-button>
+                    </div>
+                    <div style="padding-top: 4px">
+                        <el-button style="width:100%;" @click="back_if_login" type="primary">返回</el-button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 
 </div>
@@ -164,240 +290,399 @@
 <script src="javascripts/lib/echarts.min_tree.js"></script>
 <!--<script src="javascripts/lib/echarts-2.2.7/build/dist/echarts.js"></script>-->
 <script>
-    var myComponent = {template:'<div>i am component</div>'};
-    var com1 = {template:'<div>i am com1</div>'};
+  var myComponent = {template: '<div>i am component</div>'};
+  var com1 = {template: '<div>i am com1</div>'};
 
-    Vue.component('my-component', myComponent)
-    Vue.component('com1', com1)
-    Vue.use(VueRouter)
-    var router = new VueRouter({
-        routes: [
-            {
-                path: '/my',
-                name:'myComponent',
-                component: myComponent
-            },
-            {
-                path: '/com1',
-                name:'com1',
-                component: com1
-            },
-        ]
-    });
-    var app = new Vue({
-        el: '#app',
-        router: router,
-        data: {
-            myChart : {},
-            option : {},
-            peole_rela_charts_showflag: true,
-            tab: 0,
-            rela_layer_ifshow: false,
-            datalist: [],
-            datalist2: [],
-            tt: 'sfff',
-            searchword: '',
-            searchword2: '',
-            form: {
-                name: '',
-                classification: '',
-                phone: '',
-                region: '',
-                reladescribe: '',
-                interest: '',
-                birthday: '',
-                relaperson: '',
-                relaperson_name: '',
-                sex: '',
-                commond: '',
-                flag: false
-            },
+  Vue.component('my-component', myComponent)
+  Vue.component('com1', com1)
+  Vue.use(VueRouter)
+  var router = new VueRouter({
+    routes: [
+      {
+        path: '/my',
+        name: 'myComponent',
+        component: myComponent
+      },
+      {
+        path: '/com1',
+        name: 'com1',
+        component: com1
+      },
+    ]
+  });
+  var app = new Vue({
+    el: '#app',
+    router: router,
+    data: {
+      login: {
+        pw: '',
+        changedpwd: false,
+        keep_login: false,
+        if_login: false,
+        loginOrchange: true,
+        originpwd: '',
+        newpwd: ''
+      },
+      settinglist: [
+        {
+          name: '密码设置',
+          hander: (m) => {
+            app.login.changedpwd = true;
+            app.login.if_login = false;
+            app.login.loginOrchange = false;
+          }
         },
-        mounted() {
-            this.more();
-            this.init_echarts();
-        },
-        methods: {
-            add() {
-                for (var o in this.form) {
-                    this.form[o] = '';
-                }
-                this.tab = 1;
-            },
-            more() {
-                this.tab = 0;
-                var that = this;
-                axios.get('/people/get', {}).then(res => {
-                    console.log(res)
-                    that.datalist = res.data;
-                }).catch(err => {
-                    console.error(err)
-                })
-            },
-            onSubmit() {
-                var that = this;
-                var formData = new FormData()
-//                formData.append('fd', this.form);
-                axios.post('/people/save', this.form).then(res => {
-                    this.more();
-                }).catch(err => {
-                    console.error(err)
-                })
-            },
-            cancel() {
-                this.tab = 0;
-            },
-            showdetail(item) {
-                this.tab = 2;
-                this.option.series[0].data[0]={};
-                this.myChart.setOption(this.option);
-                axios.post('/people/getRela', item).then(res => {
-//                    this.more();
-                    console.log(res.data);
-                    this.option.series[0].data[0]=res.data;
-                    this.myChart.setOption(this.option);
-                }).catch(err => {
-                    console.error(err)
-                })
-            },
-            edit(item) {
-                this.tab = 1;
-                this.form = item;
-            },
-            open_guanlianren_dialog() {
-                this.rela_layer_ifshow = true;
-                this.reset_query();
-            },
-            select(item) {
-                console.log('select')
-                let f = item.isSelect;
-                this.$set(item, 'isSelect', !f)
-            },
-            search() {
-                this.tab = 0;
-                let searchword = this.searchword;
-                let filter = this.datalist.filter(item => {
-                    let flag = false;
-                    for (var o in item) {
-                        if (typeof(item[o]) == "string") {
-                            if (item[o].indexOf(searchword) > -1) {
-                                flag = true;
-                            }
-                        }
-                    }
-                    return flag;
-                });
-                this.datalist = filter;
-            },
-            search2() {
-//                this.tab = 0;
-                let searchword = this.searchword2;
-                let filter = this.datalist.filter(item => {
-                    let flag = false;
-                    for (var o in item) {
-                        if (typeof(item[o]) == "string") {
-                            if (item[o].indexOf(searchword) > -1) {
-                                flag = true;
-                            }
-                        }
-                    }
-                    return flag;
-                });
-                this.datalist2 = filter;
-            },
-            reset_query() {
-//                this.tab = 0;
-                this.searchword2 = '';
-                var that = this;
-                axios.get('/people/get', {}).then(res => {
-                    console.log(res)
-                    that.datalist2 = res.data;
-                }).catch(err => {
-                    console.error(err)
-                })
-            },
-            rela_queding() {
-                let idarr = [];
-                let namearr = [];
-                let join = this.datalist2.filter(item => item.isSelect == true);
-                join.forEach(item => {
-                    idarr.push(item.id)
-                    namearr.push(item.name)
-                });
-//                console.log(idarr.join(','))
-                this.form.relaperson = idarr.join(',');
-                this.form.relaperson_name = namearr.join(',');
-                this.rela_layer_ifshow = false;
-            },
-            rela_cancle() {
-                this.rela_layer_ifshow = false;
-            },
-            init_echarts() {
-                let clientWidth = document.body.clientWidth;
-                let persondiv = document.querySelector('#person_rela_chart');
-                persondiv.style.width = clientWidth+'px';
-                var myChart = echarts.init(document.getElementById('person_rela_chart'));
-                var option = {
-                    series: [
-                        {
-                            name: '树图',
-                            type: 'tree',
-                            initialTreeDepth : -1,
-                            orient: 'vertical',  // vertical horizontal
-                            rootLocation: {left: '50%'}, // 根节点位置  {x: 100, y: 'center'}
-                            nodePadding: 8,
-                            layerPadding: 200,
-                            hoverable: false,
-                            roam: true,
-                            symbolSize: 16,
-                            itemStyle: {
-                                normal: {
-                                    color: '#4883b4',
-                                    label: {
-                                        show: true,
-                                        position: 'right',
-                                        formatter: "{b}",
-                                        textStyle: {
-                                            color: '#000',
-                                            fontSize: 16
-                                        }
-                                    },
-                                    lineStyle: {
-                                        color: '#ccc',
-                                        type: 'solid' // 'curve'|'broken'|'solid'|'dotted'|'dashed'
-                                    }
-                                },
-                                emphasis: {
-                                    color: '#4883b4',
-                                    label: {
-                                        show: false
-                                    },
-                                    borderWidth: 0
-                                }
-                            },
-                            data: [
-                                {"name": "张三", "id": "123", "children":
-                                    [
-                                        {"id": "12","name": "李四","children":[
-                                            {"id": "12","name": "王武"},
-                                            {"id": "12","name": "王武"}
-                                        ]},
-                                        {"id": "12","name": "王武"}
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                };
-                myChart.setOption(option);
-                this.myChart = myChart;
-                this.option = option;
-                myChart.on('click', function (params) {
-                    console.log(params.data.id);
-                });
-            }
+        {
+          name: '消息提醒',
+          hander: (v) => {
+            app.tab = 4;
+            v.shentritixing();
+          }
         }
-    })
+      ],
+      myChart: {},
+      option: {},
+      searchType: 'xm',
+      peole_rela_charts_showflag: true,
+      tab: 0,
+      rela_layer_ifshow: false,
+      datalist: [],
+      datalist2: [],
+      tt: '',
+      showInterest: '',
+      searchword: '',
+      searchword2: '',
+      samexh: '',
+      form: {
+        name: '',
+        classification: '',
+        phone: '',
+        region: '',
+        reladescribe: '',
+        interest: '',
+        hate: '',
+        birthday: '',
+        relaperson: '',
+        relaperson_name: '',
+        sex: '',
+        commond: '',
+        flag: false
+      },
+      show_shengritixing : false,
+      list_shengritixing : [],
+    },
+    mounted() {
+      this.more();
+      this.init_echarts();
+      this.cookieLogin();
+      this.tab = 4;
+    },
+    methods: {
+      shentritixing(){
+        let that = this;
+        this.show_shengritixing = !this.show_shengritixing;
+        if(this.show_shengritixing){
+          axios.get('/people/birth', {}).then(res => {
+            that.list_shengritixing = res.data;
+          }).catch(err => {
+            console.error(err)
+          })
+        }
+
+      },
+      back_if_login() {
+        if (this.login.changedpwd == true) {
+          this.login.if_login = true;
+          this.tab = 3;
+        } else {
+          this.login.loginOrchange = true;
+        }
+      },
+      settingclick(item) {
+        item.hander(this);
+      },
+      setting() {
+        this.tab = 3;
+      },
+      clickLogin() {
+        axios.post('/people/login', null).then(res => {
+          if (res.data.pwd === this.login.pw) {
+            if (this.login.keep_login === true) {
+              this.setCookie('pwd', this.login.pw, '9999')
+            }
+            this.login.if_login = true;
+          } else {
+            this.$message({
+              message: '密码错误!',
+              type: 'error',
+              showClose: ' true',
+              duration: 1000,
+            });
+          }
+        }).catch(err => {
+          console.error(err)
+        })
+      },
+      cookieLogin() {
+        axios.post('/people/login', null).then(res => {
+          let pwdval = this.getCookie('pwd');
+          if (pwdval != '') {
+            if (pwdval === res.data.pwd) {
+              this.login.if_login = true;
+              return;
+            }
+          }
+        }).catch(err => {
+          console.error(err)
+        })
+      },
+      setCookie(name, value, days) {
+        const oDate = new Date();
+        oDate.setDate(oDate.getDate() + days);   //days为保存时间长度
+        document.cookie = name + '=' + value + ';expires=' + oDate;
+      },
+      getCookie(name) {
+        var arr = document.cookie.split(';');
+        for (var i = 0; i < arr.length; i++) {
+          var arr2 = arr[i].split('=');
+          if (arr2[0] == name) {
+            return arr2[1];
+          }
+        }
+        return '';
+      },
+      changePw() {
+        this.login.loginOrchange = false;
+        this.login.originpwd = '';
+        this.login.newpwd = '';
+      },
+      changePw_queding() {
+        var that = this;
+        axios.post('/people/login', null)
+          .then(res => {
+            if (!(this.login.originpwd === res.data.pwd)) {
+              this.$message.error('原密码错误!');
+              return;
+            }
+            if (this.login.newpwd == '') {
+              this.$message.error('新密码不能为空!');
+              return;
+            }
+            axios.post('/people/saveNewPwd', {newpwd: this.login.newpwd}).then(res => {
+              that.$message({
+                message: '密码修改成功!',
+                type: 'success',
+                showClose: ' true',
+                duration: 500,
+                onClose: () => {
+                  that.login.loginOrchange = true;
+                }
+              });
+            });
+          })
+          .catch(err => {
+            that.$message.error(err);
+          })
+      },
+      add() {
+        for (var o in this.form) {
+          this.form[o] = '';
+        }
+        this.tab = 1;
+      },
+      more() {
+        this.tab = 0;
+        this.searchword = '';
+        var that = this;
+        axios.get('/people/get', {}).then(res => {
+          that.datalist = res.data;
+        }).catch(err => {
+          console.error(err)
+        })
+      },
+      onSubmit() {
+        axios.post('/people/save', this.form).then(res => {
+          this.more();
+        }).catch(err => {
+          console.error(err)
+        })
+      },
+      cancel() {
+        this.tab = 0;
+      },
+      showdetail(item) {
+        this.tab = 2;
+        this.option.series[0].data[0] = {};
+        this.myChart.setOption(this.option);
+        this.showInterest = item.interest;
+        axios.post('/people/getRela', item).then(res => {
+          this.option.series[0].data[0] = res.data;
+          this.myChart.setOption(this.option);
+        }).catch(err => {
+          console.error(err)
+        })
+        axios.get('/people/get', {}).then(res => {
+          let samexh = res.data.filter(obj => {
+            return obj.interest.indexOf(item.interest) > -1 &&
+              item.interest != '' &&
+              obj.id != item.id
+
+          }).map(item => {
+            return item.name;
+          });
+          this.samexh = samexh.join(',')
+        }).catch(err => {
+          console.error(err)
+        })
+      },
+      edit(item) {
+        this.tab = 1;
+        this.form = item;
+      },
+      open_guanlianren_dialog() {
+        this.rela_layer_ifshow = true;
+        this.reset_query();
+      },
+      select(item) {
+        console.log('select')
+        let f = item.isSelect;
+        this.$set(item, 'isSelect', !f)
+      },
+      search() {
+        this.tab = 0;
+        let searchword = this.searchword;
+        let filter = [];
+        if ('xm' == this.searchType) {
+          filter = this.datalist.filter(item => {
+            return item.name.indexOf(searchword) > -1
+          });
+        }
+        if ('hm' == this.searchType) {
+          filter = this.datalist.filter(item => {
+            return item.phone.indexOf(searchword) > -1
+          });
+        }
+        if ('xh' == this.searchType) {
+          filter = this.datalist.filter(item => {
+            return item.interest.indexOf(searchword) > -1
+          });
+        }
+        this.datalist = filter;
+      },
+      search2() {
+//                this.tab = 0;
+        let searchword = this.searchword2;
+        let filter = this.datalist.filter(item => {
+          let flag = false;
+          for (var o in item) {
+            if (typeof(item[o]) == 'string') {
+              if (item[o].indexOf(searchword) > -1) {
+                flag = true;
+              }
+            }
+          }
+          return flag;
+        });
+        this.datalist2 = filter;
+      },
+      reset_query() {
+//                this.tab = 0;
+        this.searchword2 = '';
+        var that = this;
+        axios.get('/people/get', {}).then(res => {
+          console.log(res)
+          that.datalist2 = res.data;
+        }).catch(err => {
+          console.error(err)
+        })
+      },
+      rela_queding() {
+        let idarr = [];
+        let namearr = [];
+        let join = this.datalist2.filter(item => item.isSelect == true);
+        join.forEach(item => {
+          idarr.push(item.id)
+          namearr.push(item.name)
+        });
+//                console.log(idarr.join(','))
+        this.form.relaperson = idarr.join(',');
+        this.form.relaperson_name = namearr.join(',');
+        this.rela_layer_ifshow = false;
+      },
+      rela_cancle() {
+        this.rela_layer_ifshow = false;
+      },
+      init_echarts() {
+        let clientWidth = document.body.clientWidth;
+        let persondiv = document.querySelector('#person_rela_chart');
+        persondiv.style.width = clientWidth + 'px';
+        var myChart = echarts.init(document.getElementById('person_rela_chart'));
+        var option = {
+          series: [
+            {
+              name: '树图',
+              type: 'tree',
+              top: '5%',
+              initialTreeDepth: -1,
+              expandAndCollapse: false,
+              orient: 'vertical',  // vertical horizontal
+              rootLocation: {left: '50%'}, // 根节点位置  {x: 100, y: 'center'}
+              nodePadding: 8,
+              layerPadding: 200,
+              hoverable: false,
+              roam: true,
+              symbolSize: 16,
+              itemStyle: {
+                normal: {
+                  color: '#4883b4',
+                  label: {
+                    show: true,
+                    position: 'right',
+                    formatter: '{b}',
+                    textStyle: {
+                      color: '#000',
+                      fontSize: 16
+                    }
+                  },
+                  lineStyle: {
+                    color: '#ccc',
+                    type: 'solid' // 'curve'|'broken'|'solid'|'dotted'|'dashed'
+                  }
+                },
+                emphasis: {
+                  color: '#4883b4',
+                  label: {
+                    show: false
+                  },
+                  borderWidth: 0
+                }
+              },
+              data: [
+                {
+                  'name': '张三', 'id': '123', 'children':
+                  [
+                    {
+                      'id': '12', 'name': '李四', 'children': [
+                      {'id': '12', 'name': '王武'},
+                      {'id': '12', 'name': '王武'}
+                    ]
+                    },
+                    {'id': '12', 'name': '王武'}
+                  ]
+                }
+              ]
+            }
+          ]
+        };
+        myChart.setOption(option);
+        this.myChart = myChart;
+        this.option = option;
+//                myChart.on('click', function (params) {
+//                    console.log(params.data.id);
+//                });
+      }
+    }
+  })
 
 
 </script>

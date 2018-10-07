@@ -12,7 +12,6 @@ var peopleRepository = {
             let people = data.toString();//将二进制的数据转换为字符串
             people = JSON.parse(people);//将字符串转换为json对象
             if(obj.id !=null && obj.id != ''){
-                console.log('nnnnnnnnnnnnnnnn')
                 obj.date = Date.now();
                 people.splice(people.findIndex(item => item.id === obj.id), 1,obj);
             }else{
