@@ -26,27 +26,31 @@ router.get('/birth', function (req, res, next) {
   rs.then(data => {
     let filter = data
       .filter(item => {
+        let b = true;
         let birthArr = item.birthday.split('-');
         let month = birthArr[1]*1;
         let day = birthArr[2]*1;
-        let b = ((month <= mm*1) && (day <=dd*1));
+        b = ((month >= mm*1));
+        if(month == mm*1){
+          b = ((day >= dd*1));
+        }
         return b;
       });
-    filter.map(item => {
+    filter.forEach(item => {
         let birthArr = item.birthday.split('-');
-        item.mCut = mm*1 - birthArr[1]*1;
-        item.dCut = dd*1 - birthArr[2]*1;
-      })
-      .sort((a, b) => {
+        item.mCut = birthArr[1]*1;
+        item.dCut = birthArr[2]*1;
+      });
+    filter.sort((a, b) => {
         if (b.mCut > a.mCut) {
-          return true;
-        } else if (b.mCut < a.mCut) {
           return false;
+        } else if (b.mCut < a.mCut) {
+          return true;
         } else {
           if (b.dCut >= a.dCut) {
-            return true;
-          } else {
             return false;
+          } else {
+            return true;
           }
         }
       });

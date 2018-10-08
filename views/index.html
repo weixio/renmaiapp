@@ -144,7 +144,10 @@
                 <el-form-item label="备注">
                     <el-input type="textarea" v-model="form.commond"></el-input>
                 </el-form-item>
-                <el-form-item>
+                <el-form-item v-if="srtx_flag">
+                    <el-button @click="srtx_cancel">取消</el-button>
+                </el-form-item>
+                <el-form-item v-else>
                     <el-button type="primary" @click="onSubmit">保存</el-button>
                     <el-button @click="cancel">取消</el-button>
                 </el-form-item>
@@ -183,7 +186,7 @@
                 </div>
 
                 <div v-show="show_shengritixing">
-                    <div v-for="item in list_shengritixing"
+                    <div v-for="item in list_shengritixing" @click="srtx_detail(item)"
                             style="display: flex;background-color: #e9eaf0;height: 60px;margin: 5px 10px;font-size: 20px;position: relative ">
                         <div style="line-height: 60px;padding: 0 20px;"><span style="line-height: 60px">{{item.name}}</span></div>
                         <div style="line-height: 60px;padding: 0 20px;position:absolute;right: 0;top: 0">
@@ -370,6 +373,7 @@
       },
       show_shengritixing : false,
       list_shengritixing : [],
+      srtx_flag : false
     },
     mounted() {
       this.more();
@@ -379,6 +383,7 @@
     },
     methods: {
       shentritixing(){
+        this.srtx_flag = true;
         let that = this;
         this.show_shengritixing = !this.show_shengritixing;
         if(this.show_shengritixing){
@@ -493,6 +498,7 @@
       more() {
         this.tab = 0;
         this.searchword = '';
+        this.srtx_flag = false;
         var that = this;
         axios.get('/people/get', {}).then(res => {
           that.datalist = res.data;
@@ -509,6 +515,10 @@
       },
       cancel() {
         this.tab = 0;
+      },
+      srtx_cancel(){
+        this.tab = 4;
+//        this.shentritixing();
       },
       showdetail(item) {
         this.tab = 2;
@@ -536,6 +546,10 @@
         })
       },
       edit(item) {
+        this.tab = 1;
+        this.form = item;
+      },
+      srtx_detail(item) {
         this.tab = 1;
         this.form = item;
       },

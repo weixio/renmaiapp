@@ -1,0 +1,10 @@
+form.name
+form.classification
+form.phone
+form.region
+reladescribe
+form.interest
+birthday
+relaperson
+sex
+commond
