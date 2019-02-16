@@ -35,20 +35,21 @@
             width: 100px;
         }
 
-        .expand{
-            transform:rotate(90deg)  !important;;
-            -ms-transform:rotate(90deg)  !important;; 	/* IE 9 */
-            -moz-transform:rotate(90deg)  !important;; 	/* Firefox */
-            -webkit-transform:rotate(90deg)  !important;; /* Safari 和 Chrome */
-            -o-transform:rotate(90deg)  !important;; 	/* Opera */
+        .expand {
+            transform: rotate(90deg) !important;;
+            -ms-transform: rotate(90deg) !important;; /* IE 9 */
+            -moz-transform: rotate(90deg) !important;; /* Firefox */
+            -webkit-transform: rotate(90deg) !important;; /* Safari 和 Chrome */
+            -o-transform: rotate(90deg) !important;; /* Opera */
             /*transition: all .3s;*/
         }
-        .collapse{
-            transform:rotate(0deg);
-            -ms-transform:rotate(0deg) ; 	/* IE 9 */
-            -moz-transform:rotate(0deg) ; 	/* Firefox */
-            -webkit-transform:rotate(0deg); /* Safari 和 Chrome */
-            -o-transform:rotate(0deg); 	/* Opera */
+
+        .collapse {
+            transform: rotate(0deg);
+            -ms-transform: rotate(0deg); /* IE 9 */
+            -moz-transform: rotate(0deg); /* Firefox */
+            -webkit-transform: rotate(0deg); /* Safari 和 Chrome */
+            -o-transform: rotate(0deg); /* Opera */
             transition: all .3s;
         }
     </style>
@@ -86,8 +87,8 @@
                     </div>
                 </div>
             </div>
-            <el-form v-show="tab == 1" ref="form" :model="form" label-width="80px">
-                <el-form-item label="姓名">
+            <el-form v-show="tab == 1" ref="form" :model="form" :rules="rules" label-width="80px">
+                <el-form-item label="姓名" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-form-item label="分类">
@@ -96,7 +97,7 @@
                         <el-option label="好友" value="haoyou"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="号码">
+                <el-form-item label="号码" prop="phone">
                     <el-input v-model="form.phone"></el-input>
                 </el-form-item>
                 <el-form-item label="事业领域">
@@ -179,7 +180,7 @@
                     <div style="line-height: 60px;padding: 0 20px;"><span style="line-height: 60px">生日提醒</span></div>
                     <div style="line-height: 60px;padding: 0 20px;position:absolute;right: 0;top: 0"
                          class="collapse" :class="{expand : show_shengritixing}">
-                        <i  class="el-icon-arrow-right " ></i>
+                        <i class="el-icon-arrow-right "></i>
                         <!--<i v-show="!show_shengritixing" class="el-icon-arrow-right"></i>-->
                         <!--<i v-show="show_shengritixing" class="el-icon-arrow-down"></i>-->
                     </div>
@@ -187,8 +188,9 @@
 
                 <div v-show="show_shengritixing">
                     <div v-for="item in list_shengritixing" @click="srtx_detail(item)"
-                            style="display: flex;background-color: #e9eaf0;height: 60px;margin: 5px 10px;font-size: 20px;position: relative ">
-                        <div style="line-height: 60px;padding: 0 20px;"><span style="line-height: 60px">{{item.name}}</span></div>
+                         style="display: flex;background-color: #e9eaf0;height: 60px;margin: 5px 10px;font-size: 20px;position: relative ">
+                        <div style="line-height: 60px;padding: 0 20px;"><span
+                                style="line-height: 60px">{{item.name}}</span></div>
                         <div style="line-height: 60px;padding: 0 20px;position:absolute;right: 0;top: 0">
                             {{item.birthday}}
                         </div>
@@ -204,8 +206,8 @@
         </section>
         <footer style="position: fixed;bottom:0px;height: 50px; background-color: #00B7FF;width: 100%">
             <div style="display: flex;margin: 5px;">
-                <el-button type="primary" icon="el-icon-more" style=" flex-grow:1" @click="more"></el-button>
-                <el-button type="success" icon="el-icon-plus" style=" flex-grow:1" @click="add"></el-button>
+                <el-button type="primary" style=" flex-grow:1" @click="more">列表</el-button>
+                <el-button type="success" style=" flex-grow:1" @click="add">添加</el-button>
                 <el-button type="success" tyle=" flex-grow:1" style=" flex-grow:1" @click="setting">设置</el-button>
             </div>
         </footer>
@@ -293,410 +295,427 @@
 <script src="javascripts/lib/echarts.min_tree.js"></script>
 <!--<script src="javascripts/lib/echarts-2.2.7/build/dist/echarts.js"></script>-->
 <script>
-  var myComponent = {template: '<div>i am component</div>'};
-  var com1 = {template: '<div>i am com1</div>'};
+    var myComponent = {template: '<div>i am component</div>'};
+    var com1 = {template: '<div>i am com1</div>'};
 
-  Vue.component('my-component', myComponent)
-  Vue.component('com1', com1)
-  Vue.use(VueRouter)
-  var router = new VueRouter({
-    routes: [
-      {
-        path: '/my',
-        name: 'myComponent',
-        component: myComponent
-      },
-      {
-        path: '/com1',
-        name: 'com1',
-        component: com1
-      },
-    ]
-  });
-  var app = new Vue({
-    el: '#app',
-    router: router,
-    data: {
-      login: {
-        pw: '',
-        changedpwd: false,
-        keep_login: false,
-        if_login: false,
-        loginOrchange: true,
-        originpwd: '',
-        newpwd: ''
-      },
-      settinglist: [
-        {
-          name: '密码设置',
-          hander: (m) => {
-            app.login.changedpwd = true;
-            app.login.if_login = false;
-            app.login.loginOrchange = false;
-          }
-        },
-        {
-          name: '消息提醒',
-          hander: (v) => {
-            app.tab = 4;
-            v.shentritixing();
-          }
-        }
-      ],
-      myChart: {},
-      option: {},
-      searchType: 'xm',
-      peole_rela_charts_showflag: true,
-      tab: 0,
-      rela_layer_ifshow: false,
-      datalist: [],
-      datalist2: [],
-      tt: '',
-      showInterest: '',
-      searchword: '',
-      searchword2: '',
-      samexh: '',
-      form: {
-        name: '',
-        classification: '',
-        phone: '',
-        region: '',
-        reladescribe: '',
-        interest: '',
-        hate: '',
-        birthday: '',
-        relaperson: '',
-        relaperson_name: '',
-        sex: '',
-        commond: '',
-        flag: false
-      },
-      show_shengritixing : false,
-      list_shengritixing : [],
-      srtx_flag : false
-    },
-    mounted() {
-      this.more();
-      this.init_echarts();
-      this.cookieLogin();
-      this.tab = 4;
-    },
-    methods: {
-      shentritixing(){
-        this.srtx_flag = true;
-        let that = this;
-        this.show_shengritixing = !this.show_shengritixing;
-        if(this.show_shengritixing){
-          axios.get('/people/birth', {}).then(res => {
-            that.list_shengritixing = res.data;
-          }).catch(err => {
-            console.error(err)
-          })
-        }
-
-      },
-      back_if_login() {
-        if (this.login.changedpwd == true) {
-          this.login.if_login = true;
-          this.tab = 3;
-        } else {
-          this.login.loginOrchange = true;
-        }
-      },
-      settingclick(item) {
-        item.hander(this);
-      },
-      setting() {
-        this.tab = 3;
-      },
-      clickLogin() {
-        axios.post('/people/login', null).then(res => {
-          if (res.data.pwd === this.login.pw) {
-            if (this.login.keep_login === true) {
-              this.setCookie('pwd', this.login.pw, '9999')
-            }
-            this.login.if_login = true;
-          } else {
-            this.$message({
-              message: '密码错误!',
-              type: 'error',
-              showClose: ' true',
-              duration: 1000,
-            });
-          }
-        }).catch(err => {
-          console.error(err)
-        })
-      },
-      cookieLogin() {
-        axios.post('/people/login', null).then(res => {
-          let pwdval = this.getCookie('pwd');
-          if (pwdval != '') {
-            if (pwdval === res.data.pwd) {
-              this.login.if_login = true;
-              return;
-            }
-          }
-        }).catch(err => {
-          console.error(err)
-        })
-      },
-      setCookie(name, value, days) {
-        const oDate = new Date();
-        oDate.setDate(oDate.getDate() + days);   //days为保存时间长度
-        document.cookie = name + '=' + value + ';expires=' + oDate;
-      },
-      getCookie(name) {
-        var arr = document.cookie.split(';');
-        for (var i = 0; i < arr.length; i++) {
-          var arr2 = arr[i].split('=');
-          if (arr2[0] == name) {
-            return arr2[1];
-          }
-        }
-        return '';
-      },
-      changePw() {
-        this.login.loginOrchange = false;
-        this.login.originpwd = '';
-        this.login.newpwd = '';
-      },
-      changePw_queding() {
-        var that = this;
-        axios.post('/people/login', null)
-          .then(res => {
-            if (!(this.login.originpwd === res.data.pwd)) {
-              this.$message.error('原密码错误!');
-              return;
-            }
-            if (this.login.newpwd == '') {
-              this.$message.error('新密码不能为空!');
-              return;
-            }
-            axios.post('/people/saveNewPwd', {newpwd: this.login.newpwd}).then(res => {
-              that.$message({
-                message: '密码修改成功!',
-                type: 'success',
-                showClose: ' true',
-                duration: 500,
-                onClose: () => {
-                  that.login.loginOrchange = true;
-                }
-              });
-            });
-          })
-          .catch(err => {
-            that.$message.error(err);
-          })
-      },
-      add() {
-        for (var o in this.form) {
-          this.form[o] = '';
-        }
-        this.tab = 1;
-      },
-      more() {
-        this.tab = 0;
-        this.searchword = '';
-        this.srtx_flag = false;
-        var that = this;
-        axios.get('/people/get', {}).then(res => {
-          that.datalist = res.data;
-        }).catch(err => {
-          console.error(err)
-        })
-      },
-      onSubmit() {
-        axios.post('/people/save', this.form).then(res => {
-          this.more();
-        }).catch(err => {
-          console.error(err)
-        })
-      },
-      cancel() {
-        this.tab = 0;
-      },
-      srtx_cancel(){
-        this.tab = 4;
-//        this.shentritixing();
-      },
-      showdetail(item) {
-        this.tab = 2;
-        this.option.series[0].data[0] = {};
-        this.myChart.setOption(this.option);
-        this.showInterest = item.interest;
-        axios.post('/people/getRela', item).then(res => {
-          this.option.series[0].data[0] = res.data;
-          this.myChart.setOption(this.option);
-        }).catch(err => {
-          console.error(err)
-        })
-        axios.get('/people/get', {}).then(res => {
-          let samexh = res.data.filter(obj => {
-            return obj.interest.indexOf(item.interest) > -1 &&
-              item.interest != '' &&
-              obj.id != item.id
-
-          }).map(item => {
-            return item.name;
-          });
-          this.samexh = samexh.join(',')
-        }).catch(err => {
-          console.error(err)
-        })
-      },
-      edit(item) {
-        this.tab = 1;
-        this.form = item;
-      },
-      srtx_detail(item) {
-        this.tab = 1;
-        this.form = item;
-      },
-      open_guanlianren_dialog() {
-        this.rela_layer_ifshow = true;
-        this.reset_query();
-      },
-      select(item) {
-        console.log('select')
-        let f = item.isSelect;
-        this.$set(item, 'isSelect', !f)
-      },
-      search() {
-        this.tab = 0;
-        let searchword = this.searchword;
-        let filter = [];
-        if ('xm' == this.searchType) {
-          filter = this.datalist.filter(item => {
-            return item.name.indexOf(searchword) > -1
-          });
-        }
-        if ('hm' == this.searchType) {
-          filter = this.datalist.filter(item => {
-            return item.phone.indexOf(searchword) > -1
-          });
-        }
-        if ('xh' == this.searchType) {
-          filter = this.datalist.filter(item => {
-            return item.interest.indexOf(searchword) > -1
-          });
-        }
-        this.datalist = filter;
-      },
-      search2() {
-//                this.tab = 0;
-        let searchword = this.searchword2;
-        let filter = this.datalist.filter(item => {
-          let flag = false;
-          for (var o in item) {
-            if (typeof(item[o]) == 'string') {
-              if (item[o].indexOf(searchword) > -1) {
-                flag = true;
-              }
-            }
-          }
-          return flag;
-        });
-        this.datalist2 = filter;
-      },
-      reset_query() {
-//                this.tab = 0;
-        this.searchword2 = '';
-        var that = this;
-        axios.get('/people/get', {}).then(res => {
-          console.log(res)
-          that.datalist2 = res.data;
-        }).catch(err => {
-          console.error(err)
-        })
-      },
-      rela_queding() {
-        let idarr = [];
-        let namearr = [];
-        let join = this.datalist2.filter(item => item.isSelect == true);
-        join.forEach(item => {
-          idarr.push(item.id)
-          namearr.push(item.name)
-        });
-//                console.log(idarr.join(','))
-        this.form.relaperson = idarr.join(',');
-        this.form.relaperson_name = namearr.join(',');
-        this.rela_layer_ifshow = false;
-      },
-      rela_cancle() {
-        this.rela_layer_ifshow = false;
-      },
-      init_echarts() {
-        let clientWidth = document.body.clientWidth;
-        let persondiv = document.querySelector('#person_rela_chart');
-        persondiv.style.width = clientWidth + 'px';
-        var myChart = echarts.init(document.getElementById('person_rela_chart'));
-        var option = {
-          series: [
+    Vue.component('my-component', myComponent)
+    Vue.component('com1', com1)
+    Vue.use(VueRouter)
+    var router = new VueRouter({
+        routes: [
             {
-              name: '树图',
-              type: 'tree',
-              top: '5%',
-              initialTreeDepth: -1,
-              expandAndCollapse: false,
-              orient: 'vertical',  // vertical horizontal
-              rootLocation: {left: '50%'}, // 根节点位置  {x: 100, y: 'center'}
-              nodePadding: 8,
-              layerPadding: 200,
-              hoverable: false,
-              roam: true,
-              symbolSize: 16,
-              itemStyle: {
-                normal: {
-                  color: '#4883b4',
-                  label: {
-                    show: true,
-                    position: 'right',
-                    formatter: '{b}',
-                    textStyle: {
-                      color: '#000',
-                      fontSize: 16
-                    }
-                  },
-                  lineStyle: {
-                    color: '#ccc',
-                    type: 'solid' // 'curve'|'broken'|'solid'|'dotted'|'dashed'
-                  }
-                },
-                emphasis: {
-                  color: '#4883b4',
-                  label: {
-                    show: false
-                  },
-                  borderWidth: 0
-                }
-              },
-              data: [
+                path: '/my',
+                name: 'myComponent',
+                component: myComponent
+            },
+            {
+                path: '/com1',
+                name: 'com1',
+                component: com1
+            },
+        ]
+    });
+    var app = new Vue({
+        el: '#app',
+        router: router,
+        data: {
+            login: {
+                pw: '',
+                changedpwd: false,
+                keep_login: false,
+                if_login: false,
+                loginOrchange: true,
+                originpwd: '',
+                newpwd: ''
+            },
+            settinglist: [
                 {
-                  'name': '张三', 'id': '123', 'children':
-                  [
-                    {
-                      'id': '12', 'name': '李四', 'children': [
-                      {'id': '12', 'name': '王武'},
-                      {'id': '12', 'name': '王武'}
-                    ]
-                    },
-                    {'id': '12', 'name': '王武'}
-                  ]
+                    name: '密码设置',
+                    hander: (m) => {
+                        app.login.changedpwd = true;
+                        app.login.if_login = false;
+                        app.login.loginOrchange = false;
+                    }
+                },
+                {
+                    name: '消息提醒',
+                    hander: (v) => {
+                        app.tab = 4;
+                        v.shentritixing();
+                    }
                 }
-              ]
+            ],
+            myChart: {},
+            option: {},
+            searchType: 'xm',
+            peole_rela_charts_showflag: true,
+            tab: 0,
+            rela_layer_ifshow: false,
+            datalist: [],
+            datalist2: [],
+            tt: '',
+            showInterest: '',
+            searchword: '',
+            searchword2: '',
+            samexh: '',
+            form: {
+                name: '',
+                classification: '',
+                phone: '',
+                region: '',
+                reladescribe: '',
+                interest: '',
+                hate: '',
+                birthday: '',
+                relaperson: '',
+                relaperson_name: '',
+                sex: '',
+                commond: '',
+                flag: false
+            },
+            show_shengritixing: false,
+            list_shengritixing: [],
+            srtx_flag: false,
+            rules: {
+                name: [
+                    { required: true, message: '请输入名称', trigger: 'blur' },
+                    { min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur' }
+                ],
+                phone: [
+                    { required: true, message: '请输入电话', trigger: 'blur' },
+                ],
             }
-          ]
-        };
-        myChart.setOption(option);
-        this.myChart = myChart;
-        this.option = option;
+        },
+        mounted() {
+            this.more();
+            this.init_echarts();
+            this.cookieLogin();
+            this.tab = 0;
+        },
+        methods: {
+            shentritixing() {
+                this.srtx_flag = true;
+                let that = this;
+                this.show_shengritixing = !this.show_shengritixing;
+                if (this.show_shengritixing) {
+                    axios.get('/people/birth', {}).then(res => {
+                        that.list_shengritixing = res.data;
+                    }).catch(err => {
+                        console.error(err)
+                    })
+                }
+
+            },
+            back_if_login() {
+                if (this.login.changedpwd == true) {
+                    this.login.if_login = true;
+                    this.tab = 3;
+                } else {
+                    this.login.loginOrchange = true;
+                }
+            },
+            settingclick(item) {
+                item.hander(this);
+            },
+            setting() {
+                this.tab = 3;
+            },
+            clickLogin() {
+                axios.post('/people/login', null).then(res => {
+                    if (res.data.pwd === this.login.pw) {
+                        if (this.login.keep_login === true) {
+                            this.setCookie('pwd', this.login.pw, '9999')
+                        }
+                        this.login.if_login = true;
+                    } else {
+                        this.$message({
+                            message: '密码错误!',
+                            type: 'error',
+                            showClose: ' true',
+                            duration: 1000,
+                        });
+                    }
+                }).catch(err => {
+                    console.error(err)
+                })
+            },
+            cookieLogin() {
+                axios.post('/people/login', null).then(res => {
+                    let pwdval = this.getCookie('pwd');
+                    if (pwdval != '') {
+                        if (pwdval === res.data.pwd) {
+                            this.login.if_login = true;
+                            return;
+                        }
+                    }
+                }).catch(err => {
+                    console.error(err)
+                })
+            },
+            setCookie(name, value, days) {
+                const oDate = new Date();
+                oDate.setDate(oDate.getDate() + days);   //days为保存时间长度
+                document.cookie = name + '=' + value + ';expires=' + oDate;
+            },
+            getCookie(name) {
+                var arr = document.cookie.split(';');
+                for (var i = 0; i < arr.length; i++) {
+                    var arr2 = arr[i].split('=');
+                    if (arr2[0] == name) {
+                        return arr2[1];
+                    }
+                }
+                return '';
+            },
+            changePw() {
+                this.login.loginOrchange = false;
+                this.login.originpwd = '';
+                this.login.newpwd = '';
+            },
+            changePw_queding() {
+                var that = this;
+                axios.post('/people/login', null)
+                    .then(res => {
+                        if (!(this.login.originpwd === res.data.pwd)) {
+                            this.$message.error('原密码错误!');
+                            return;
+                        }
+                        if (this.login.newpwd == '') {
+                            this.$message.error('新密码不能为空!');
+                            return;
+                        }
+                        axios.post('/people/saveNewPwd', {newpwd: this.login.newpwd}).then(res => {
+                            that.$message({
+                                message: '密码修改成功!',
+                                type: 'success',
+                                showClose: ' true',
+                                duration: 500,
+                                onClose: () => {
+                                    that.login.loginOrchange = true;
+                                }
+                            });
+                        });
+                    })
+                    .catch(err => {
+                        that.$message.error(err);
+                    })
+            },
+            add() {
+                for (var o in this.form) {
+                    this.form[o] = '';
+                }
+                this.tab = 1;
+            },
+            more() {
+                this.tab = 0;
+                this.searchword = '';
+                this.srtx_flag = false;
+                var that = this;
+                axios.get('/people/get', {}).then(res => {
+                    that.datalist = res.data;
+                }).catch(err => {
+                    console.error(err)
+                })
+            },
+            onSubmit() {
+                this.$refs['form'].validate((valid) => {
+                    if (valid) {
+                        axios.post('/people/save', this.form).then(res => {
+                            this.more();
+                        }).catch(err => {
+                            console.error(err)
+                        })
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+
+            },
+            cancel() {
+                this.tab = 0;
+            },
+            srtx_cancel() {
+                this.tab = 4;
+//        this.shentritixing();
+            },
+            showdetail(item) {
+                this.tab = 2;
+                this.option.series[0].data[0] = {};
+                this.myChart.setOption(this.option);
+                this.showInterest = item.interest;
+                axios.post('/people/getRela', item).then(res => {
+                    this.option.series[0].data[0] = res.data;
+                    this.myChart.setOption(this.option);
+                }).catch(err => {
+                    console.error(err)
+                })
+                axios.get('/people/get', {}).then(res => {
+                    let samexh = res.data.filter(obj => {
+                        return obj.interest.indexOf(item.interest) > -1 &&
+                            item.interest != '' &&
+                            obj.id != item.id
+
+                    }).map(item => {
+                        return item.name;
+                    });
+                    this.samexh = samexh.join(',')
+                }).catch(err => {
+                    console.error(err)
+                })
+            },
+            edit(item) {
+                this.tab = 1;
+                this.form = item;
+            },
+            srtx_detail(item) {
+                this.tab = 1;
+                this.form = item;
+            },
+            open_guanlianren_dialog() {
+                this.rela_layer_ifshow = true;
+                this.reset_query();
+            },
+            select(item) {
+                console.log('select')
+                let f = item.isSelect;
+                this.$set(item, 'isSelect', !f)
+            },
+            search() {
+                this.tab = 0;
+                let searchword = this.searchword;
+                let filter = [];
+                if ('xm' == this.searchType) {
+                    filter = this.datalist.filter(item => {
+                        return item.name.indexOf(searchword) > -1
+                    });
+                }
+                if ('hm' == this.searchType) {
+                    filter = this.datalist.filter(item => {
+                        return item.phone.indexOf(searchword) > -1
+                    });
+                }
+                if ('xh' == this.searchType) {
+                    filter = this.datalist.filter(item => {
+                        return item.interest.indexOf(searchword) > -1
+                    });
+                }
+                this.datalist = filter;
+            },
+            search2() {
+//                this.tab = 0;
+                let searchword = this.searchword2;
+                let filter = this.datalist.filter(item => {
+                    let flag = false;
+                    for (var o in item) {
+                        if (typeof(item[o]) == 'string') {
+                            if (item[o].indexOf(searchword) > -1) {
+                                flag = true;
+                            }
+                        }
+                    }
+                    return flag;
+                });
+                this.datalist2 = filter;
+            },
+            reset_query() {
+//                this.tab = 0;
+                this.searchword2 = '';
+                var that = this;
+                axios.get('/people/get', {}).then(res => {
+                    console.log(res)
+                    that.datalist2 = res.data;
+                }).catch(err => {
+                    console.error(err)
+                })
+            },
+            rela_queding() {
+                let idarr = [];
+                let namearr = [];
+                let join = this.datalist2.filter(item => item.isSelect == true);
+                join.forEach(item => {
+                    idarr.push(item.id)
+                    namearr.push(item.name)
+                });
+//                console.log(idarr.join(','))
+                this.form.relaperson = idarr.join(',');
+                this.form.relaperson_name = namearr.join(',');
+                this.rela_layer_ifshow = false;
+            },
+            rela_cancle() {
+                this.rela_layer_ifshow = false;
+            },
+            init_echarts() {
+                let clientWidth = document.body.clientWidth;
+                let persondiv = document.querySelector('#person_rela_chart');
+                persondiv.style.width = clientWidth + 'px';
+                var myChart = echarts.init(document.getElementById('person_rela_chart'));
+                var option = {
+                    series: [
+                        {
+                            name: '树图',
+                            type: 'tree',
+                            top: '5%',
+                            initialTreeDepth: -1,
+                            expandAndCollapse: false,
+                            orient: 'vertical',  // vertical horizontal
+                            rootLocation: {left: '50%'}, // 根节点位置  {x: 100, y: 'center'}
+                            nodePadding: 8,
+                            layerPadding: 200,
+                            hoverable: false,
+                            roam: true,
+                            symbolSize: 16,
+                            itemStyle: {
+                                normal: {
+                                    color: '#4883b4',
+                                    label: {
+                                        show: true,
+                                        position: 'right',
+                                        formatter: '{b}',
+                                        textStyle: {
+                                            color: '#000',
+                                            fontSize: 16
+                                        }
+                                    },
+                                    lineStyle: {
+                                        color: '#ccc',
+                                        type: 'solid' // 'curve'|'broken'|'solid'|'dotted'|'dashed'
+                                    }
+                                },
+                                emphasis: {
+                                    color: '#4883b4',
+                                    label: {
+                                        show: false
+                                    },
+                                    borderWidth: 0
+                                }
+                            },
+                            data: [
+                                {
+                                    'name': '张三', 'id': '123', 'children':
+                                        [
+                                            {
+                                                'id': '12', 'name': '李四', 'children': [
+                                                    {'id': '12', 'name': '王武'},
+                                                    {'id': '12', 'name': '王武'}
+                                                ]
+                                            },
+                                            {'id': '12', 'name': '王武'}
+                                        ]
+                                }
+                            ]
+                        }
+                    ]
+                };
+                myChart.setOption(option);
+                this.myChart = myChart;
+                this.option = option;
 //                myChart.on('click', function (params) {
 //                    console.log(params.data.id);
 //                });
-      }
-    }
-  })
+            }
+        }
+    })
 
 
 </script>
